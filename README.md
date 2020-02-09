@@ -13,14 +13,13 @@ Run `serverless deploy` or `sls deploy`
 ## Remove or delete the entire stack from AWS 
 Run `serverless remove` or `sls remove`
 
-## Optional - Testing offline prior to deployment 
-For this you need to install the plugin serverless-offline by running `npm install serverless-offline` or `yarn add serverless offline`
-while in your project directory. Then add a plugins section in your serverless.yml file with serverless-offline as an item in the array:
+## Invoking the scraper at a specified rate
+I used CloudWatch event rules to invoke my function every 12 hours. I also create several targets with different constant JSON input of different search queries which the function expects in the event body. Below is a sample of this JSON:
 
 ```
-plugins:
-  - serverless-offline
+{
+  "baseUrl": "https://www.indeed.com.pt",
+  "query": "fullstack javascript developer"
+}
 ```
-
-Then in your command prompt or terminal, run `serverless offline` or `sls offline`. By default it starts a server with the 
-address localhost:3000 which you can visit to test your endpoints, if any.
+Use similar event body when testing the lambda function via the console.
