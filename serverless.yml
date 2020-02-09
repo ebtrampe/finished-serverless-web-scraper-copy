@@ -1,0 +1,88 @@
+
+service: web-scraper-indeed
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: us-east-1
+  stage: dev
+  memorySize: 256
+  timeout: 10
+  environment:
+    TABLE_NAME: '${self:service}-${self:provider.stage}'
+  # Attach managed policies in the role that will be created with the stack
+  # iamManagedPolicies:
+  #   - arn:aws:iam:::policy/YourPolicy
+
+functions:
+  handler:
+    handler: handler.main
+
+resources:
+  Resources:
+    ScrapeTable:
+      Type: AWS::DynamoDB::Table
+      # DeletionPolicy: Retain
+      Properties:
+        TableName: '${self:provider.environment.TABLE_NAME}'
+        AttributeDefinitions:
+          - AttributeName: jobTitle
+            AttributeType: S 
+          - AttributeName: jobUrl
+            AttributeType: S
+          - AttributeName: numMatches
+            AttributeType: N 
+          - AttributeName: jobId
+            AttributeType: S 
+          - AttributeName: timestamp
+            AttributeType: N 
+          - AttributeName: country 
+            AttributeType: S
+        KeySchema:
+          - AttributeName: jobId
+            KeyType: HASH 
+          - AttributeName: jobTitle  
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
+        LocalSecondaryIndexes:
+          - IndexName: jobId-timestamp-index
+            KeySchema:
+              - AttributeName: jobId
+                KeyType: HASH
+              - AttributeName: timestamp
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL 
+          - IndexName: jobId-numMatches-index
+            KeySchema:
+              - AttributeName: jobId
+                KeyType: HASH
+              - AttributeName: numMatches
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+        GlobalSecondaryIndexes:
+          - IndexName: title-jobUrl-index
+            KeySchema:
+              - AttributeName: jobTitle 
+                KeyType: HASH
+              - AttributeName: jobUrl
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL 
+            ProvisionedThroughput:
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 5
+          - IndexName: country-timestamp-index
+            KeySchema:
+              - AttributeName: country 
+                KeyType: HASH 
+              - AttributeName: timestamp 
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL 
+            ProvisionedThroughput:
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 5
