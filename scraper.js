@@ -50,7 +50,7 @@ exports.scrapeIndeedDetails = async listings => {
         const html = result.data;
         const $ = await cheerio.load(html);
         const desc = $('.jobsearch-jobDescriptionText').text();
-        const regex = /(node\.js)|(graphql)|(react)|(mongodb)|(aws)|(dynamodb)|(lambda)|(codecommit)|(git)|(serverless)|(cloudformation)|(docker)|(kubernetes)/gi;
+        const regex = /(node\.js)|(graphql)|(react)|(mongodb)|(aws)|(dynamodb)|(lambda)|(codecommit)|(git)|(serverless)|(cloudformation)|(docker)|(kubernetes)|(internship)|(werkstudent)/gi;
         const company = $('div.icl-u-lg-mr--sm.icl-u-xs-mr--xs').text();
         const applyUrl = $('.icl-Button.icl-Button--primary').attr('href');
         let intersection = desc.match(regex);
