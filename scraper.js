@@ -6,6 +6,8 @@ const moment = require('moment');
 AWS.config.update({ region: 'us-east-1' });
 const docClient = new AWS.DynamoDB.DocumentClient();
 
+const { regex } = require('./helpers');
+
 const tableName = process.env.TABLE_NAME;
 
 exports.scrapeIndeedListings = async url => {
@@ -25,6 +27,7 @@ exports.scrapeIndeedListings = async url => {
 
         if (domain === 'https://de.indeed.com') country = 'DE';
         else if (domain === 'https://www.indeed.pt') country = 'PT';
+        // else if (domain === 'https://www.indeed.ch') country = 'CH';
         else country = 'ES';
 
         let jobId = new URL(jobUrl);
@@ -50,7 +53,6 @@ exports.scrapeIndeedDetails = async listings => {
         const html = result.data;
         const $ = await cheerio.load(html);
         const desc = $('.jobsearch-jobDescriptionText').text();
-        const regex = /(node\.js)|(graphql)|(react)|(mongodb)|(aws)|(dynamodb)|(lambda)|(codecommit)|(git)|(serverless)|(cloudformation)|(docker)|(kubernetes)|(internship)|(werkstudent)/gi;
         const company = $('div.icl-u-lg-mr--sm.icl-u-xs-mr--xs').text();
         const applyUrl = $('.icl-Button.icl-Button--primary').attr('href');
         let intersection = desc.match(regex);
